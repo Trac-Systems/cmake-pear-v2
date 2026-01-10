@@ -26,8 +26,10 @@ function(configure_pear_appling_macos target)
     ENTITLEMENTS
   )
 
+  set(_args ${ARGV})
+  list(REMOVE_AT _args 0)
   cmake_parse_arguments(
-    PARSE_ARGV 1 ARGV "" "${one_value_keywords}" "${multi_value_keywords}"
+    ARGV "" "${one_value_keywords}" "${multi_value_keywords}" ${_args}
   )
 
   if(NOT ARGV_ICON)
