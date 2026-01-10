@@ -246,13 +246,16 @@ function(add_pear_appling target)
     set(ARGV_SPLASH "assets/splash.png")
   endif()
 
+  set(PEAR_LIBPEAR_URL "github:Trac-Systems/libpear-v2#87b7031" CACHE STRING "libpear source")
+  set(PEAR_LIBAPPLING_URL "github:holepunchto/libappling#ea34910" CACHE STRING "libappling source")
+
   bare_target(host)
 
   fetch_package("github:holepunchto/bare#f8cb4af")
   fetch_package("github:holepunchto/libjstl#098664c")
-  fetch_package("github:holepunchto/libappling#ea34910")
+  fetch_package("${PEAR_LIBAPPLING_URL}")
   fetch_package("github:holepunchto/libfx#33678eb")
-  fetch_package("github:holepunchto/libpear#bf9a1ab")
+  fetch_package("${PEAR_LIBPEAR_URL}")
 
   add_executable(${target})
 
