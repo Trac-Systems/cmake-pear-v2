@@ -244,6 +244,22 @@ function(add_pear_appling target)
     PEAR "" "${one_value_keywords}" "${multi_value_keywords}" ${ARGN}
   )
 
+  if(NOT DEFINED PEAR_ID OR PEAR_ID STREQUAL "")
+    list(FIND ARGN "ID" _pear_id_index)
+    if(NOT _pear_id_index EQUAL -1)
+      math(EXPR _pear_id_value_index "${_pear_id_index} + 1")
+      list(GET ARGN ${_pear_id_value_index} PEAR_ID)
+    endif()
+  endif()
+
+  if(NOT DEFINED PEAR_NAME OR PEAR_NAME STREQUAL "")
+    list(FIND ARGN "NAME" _pear_name_index)
+    if(NOT _pear_name_index EQUAL -1)
+      math(EXPR _pear_name_value_index "${_pear_name_index} + 1")
+      list(GET ARGN ${_pear_name_value_index} PEAR_NAME)
+    endif()
+  endif()
+
   if(NOT PEAR_SPLASH)
     set(PEAR_SPLASH "assets/splash.png")
   endif()
