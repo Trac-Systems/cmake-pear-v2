@@ -241,11 +241,11 @@ function(add_pear_appling target)
   )
 
   cmake_parse_arguments(
-    PARSE_ARGV 1 ARGV "" "${one_value_keywords}" "${multi_value_keywords}"
+    PEAR "" "${one_value_keywords}" "${multi_value_keywords}" ${ARGN}
   )
 
-  if(NOT ARGV_SPLASH)
-    set(ARGV_SPLASH "assets/splash.png")
+  if(NOT PEAR_SPLASH)
+    set(PEAR_SPLASH "assets/splash.png")
   endif()
 
 set(PEAR_LIBPEAR_URL "github:Trac-Systems/libpear-v2#987c85b" CACHE STRING "libpear source")
@@ -286,37 +286,37 @@ set(PEAR_LIBPEAR_URL "github:Trac-Systems/libpear-v2#987c85b" CACHE STRING "libp
   if(host MATCHES "darwin")
     configure_pear_appling_macos(
       ${target}
-      NAME "${ARGV_NAME}"
-      VERSION "${ARGV_VERSION}"
-      AUTHOR "${ARGV_AUTHOR}"
-      SPLASH "${ARGV_SPLASH}"
-      ICON "${ARGV_MACOS_ICON}"
-      CATEGORY "${ARGV_MACOS_CATEGORY}"
-      IDENTIFIER "${ARGV_MACOS_IDENTIFIER}"
-      ENTITLEMENTS ${ARGV_MACOS_ENTITLEMENTS}
-      SIGNING_IDENTITY "${ARGV_MACOS_SIGNING_IDENTITY}"
-      SIGNING_KEYCHAIN "${ARGV_MACOS_SIGNING_KEYCHAIN}"
+      NAME "${PEAR_NAME}"
+      VERSION "${PEAR_VERSION}"
+      AUTHOR "${PEAR_AUTHOR}"
+      SPLASH "${PEAR_SPLASH}"
+      ICON "${PEAR_MACOS_ICON}"
+      CATEGORY "${PEAR_MACOS_CATEGORY}"
+      IDENTIFIER "${PEAR_MACOS_IDENTIFIER}"
+      ENTITLEMENTS ${PEAR_MACOS_ENTITLEMENTS}
+      SIGNING_IDENTITY "${PEAR_MACOS_SIGNING_IDENTITY}"
+      SIGNING_KEYCHAIN "${PEAR_MACOS_SIGNING_KEYCHAIN}"
     )
   elseif(host MATCHES "win32")
     configure_pear_appling_windows(
       ${target}
-      NAME "${ARGV_NAME}"
-      VERSION "${ARGV_VERSION}"
-      AUTHOR "${ARGV_AUTHOR}"
-      DESCRIPTION "${ARGV_DESCRIPTION}"
-      SPLASH "${ARGV_SPLASH}"
-      ICON "${ARGV_WINDOWS_ICON}"
-      SIGNING_SUBJECT "${ARGV_WINDOWS_SIGNING_SUBJECT}"
-      SIGNING_THUMBPRINT "${ARGV_WINDOWS_SIGNING_THUMBPRINT}"
+      NAME "${PEAR_NAME}"
+      VERSION "${PEAR_VERSION}"
+      AUTHOR "${PEAR_AUTHOR}"
+      DESCRIPTION "${PEAR_DESCRIPTION}"
+      SPLASH "${PEAR_SPLASH}"
+      ICON "${PEAR_WINDOWS_ICON}"
+      SIGNING_SUBJECT "${PEAR_WINDOWS_SIGNING_SUBJECT}"
+      SIGNING_THUMBPRINT "${PEAR_WINDOWS_SIGNING_THUMBPRINT}"
     )
   elseif(host MATCHES "linux")
     configure_pear_appling_linux(
       ${target}
-      NAME "${ARGV_NAME}"
-      DESCRIPTION "${ARGV_DESCRIPTION}"
-      SPLASH "${ARGV_SPLASH}"
-      ICON "${ARGV_LINUX_ICON}"
-      CATEGORY "${ARGV_LINUX_CATEGORY}"
+      NAME "${PEAR_NAME}"
+      DESCRIPTION "${PEAR_DESCRIPTION}"
+      SPLASH "${PEAR_SPLASH}"
+      ICON "${PEAR_LINUX_ICON}"
+      CATEGORY "${PEAR_LINUX_CATEGORY}"
     )
   endif()
 endfunction()
