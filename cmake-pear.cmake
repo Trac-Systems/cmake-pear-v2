@@ -266,17 +266,13 @@ set(PEAR_LIBPEAR_URL "github:Trac-Systems/libpear-v2#987c85b" CACHE STRING "libp
     LINKER_LANGUAGE CXX
   )
 
+  set(pear_app_c "${CMAKE_CURRENT_BINARY_DIR}/pear_app.c")
+  configure_file("${pear_module_dir}/app.c.in" "${pear_app_c}" @ONLY)
+
   target_sources(
     ${target}
     PRIVATE
-      "${pear_module_dir}/app.c"
-  )
-
-  target_compile_definitions(
-    ${target}
-    PRIVATE
-      "ID=\"${ARGV_ID}\""
-      "NAME=\"${ARGV_NAME}\""
+      "${pear_app_c}"
   )
 
   target_link_libraries(
