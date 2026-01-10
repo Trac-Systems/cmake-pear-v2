@@ -5,6 +5,7 @@
   "files": [
     "*.cmake",
     "*.c",
+    "*.in",
     "*.manifest"
   ],
   "repository": {
