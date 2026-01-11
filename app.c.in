@@ -1,9 +1,38 @@
 #include <pear.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+static const char *
+resolve_platform_path(void) {
+  const char *rel = "@PEAR_PLATFORM_PATH@";
+  if (rel == NULL || rel[0] == '\0') return NULL;
+
+#if defined(_WIN32) || defined(_WIN64)
+  const char *home = getenv("USERPROFILE");
+  const char sep = '\\';
+  int is_abs = (rel[0] == '\\' || (strlen(rel) > 1 && rel[1] == ':'));
+#else
+  const char *home = getenv("HOME");
+  const char sep = '/';
+  int is_abs = (rel[0] == '/');
+#endif
+
+  if (is_abs || home == NULL || home[0] == '\0') return rel;
+
+  size_t len = strlen(home) + 1 + strlen(rel) + 1;
+  char *buf = (char *) malloc(len);
+  if (!buf) return rel;
+  snprintf(buf, len, "%s%c%s", home, sep, rel);
+  return buf;
+}
 
 int
 main(int argc, char *argv[]) {
   pear_id_t id = "@PEAR_ID@";
   const char *name = "@PEAR_NAME@";
 
+  // Use app-specific platform directory to avoid sharing pear runtime with other apps.
+  pear_path = resolve_platform_path();
   return pear_launch(argc, argv, id, name);
 }

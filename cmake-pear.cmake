@@ -221,6 +221,7 @@ function(add_pear_appling target)
     DESCRIPTION
     AUTHOR
     SPLASH
+    PLATFORM_PATH
 
     MACOS_ICON
     MACOS_CATEGORY
@@ -258,6 +259,10 @@ function(add_pear_appling target)
       math(EXPR _pear_name_value_index "${_pear_name_index} + 1")
       list(GET ARGV ${_pear_name_value_index} PEAR_NAME)
     endif()
+  endif()
+
+  if(NOT DEFINED PEAR_PLATFORM_PATH OR PEAR_PLATFORM_PATH STREQUAL "")
+    set(PEAR_PLATFORM_PATH "")
   endif()
 
   if(NOT PEAR_SPLASH)
