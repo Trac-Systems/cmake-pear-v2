@@ -269,7 +269,7 @@ function(add_pear_appling target)
     set(PEAR_SPLASH "assets/splash.png")
   endif()
 
-set(PEAR_LIBPEAR_URL "github:Trac-Systems/libpear-v2#d31ca3e" CACHE STRING "libpear source")
+set(PEAR_LIBPEAR_URL "github:Trac-Systems/libpear-v2#da785d0" CACHE STRING "libpear source")
   set(PEAR_LIBAPPLING_URL "github:holepunchto/libappling#ea34910" CACHE STRING "libappling source")
 
   bare_target(host)
