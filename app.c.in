@@ -9,7 +9,8 @@ resolve_platform_path(void) {
   if (rel == NULL || rel[0] == '\0') return NULL;
 
 #if defined(_WIN32) || defined(_WIN64)
-  const char *home = getenv("USERPROFILE");
+  const char *home = getenv("APPDATA");
+  if (home == NULL || home[0] == '\0') home = getenv("USERPROFILE");
   const char sep = '\\';
   int is_abs = (rel[0] == '\\' || (strlen(rel) > 1 && rel[1] == ':'));
 #else
