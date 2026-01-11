@@ -10,7 +10,23 @@ resolve_platform_path(void) {
 
 #if defined(_WIN32) || defined(_WIN64)
   const char *home = getenv("APPDATA");
-  if (home == NULL || home[0] == '\0') home = getenv("USERPROFILE");
+  char *home_buf = NULL;
+  int home_abs = 0;
+  if (home && home[0]) {
+    home_abs = (home[0] == '\\' || (strlen(home) > 1 && home[1] == ':'));
+    if (!home_abs) home = NULL;
+  }
+  if (home == NULL || home[0] == '\0') {
+    const char *user = getenv("USERPROFILE");
+    if (user && user[0]) {
+      size_t base_len = strlen(user) + 1 + strlen("AppData\\Roaming") + 1;
+      home_buf = (char *) malloc(base_len);
+      if (home_buf) {
+        snprintf(home_buf, base_len, "%s\\AppData\\Roaming", user);
+        home = home_buf;
+      }
+    }
+  }
   const char sep = '\\';
   int is_abs = (rel[0] == '\\' || (strlen(rel) > 1 && rel[1] == ':'));
 #else
@@ -19,12 +35,19 @@ resolve_platform_path(void) {
   int is_abs = (rel[0] == '/');
 #endif
 
-  if (is_abs || home == NULL || home[0] == '\0') return rel;
+  if (is_abs || home == NULL || home[0] == '\0') {
+    if (home_buf) free(home_buf);
+    return rel;
+  }
 
   size_t len = strlen(home) + 1 + strlen(rel) + 1;
   char *buf = (char *) malloc(len);
-  if (!buf) return rel;
+  if (!buf) {
+    if (home_buf) free(home_buf);
+    return rel;
+  }
   snprintf(buf, len, "%s%c%s", home, sep, rel);
+  if (home_buf) free(home_buf);
   return buf;
 }
 
