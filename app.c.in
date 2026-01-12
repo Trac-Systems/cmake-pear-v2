@@ -17,6 +17,17 @@ resolve_platform_path(void) {
     if (!home_abs) home = NULL;
   }
   if (home == NULL || home[0] == '\0') {
+    const char *local = getenv("LOCALAPPDATA");
+    if (local && local[0]) {
+      size_t base_len = strlen(local) + 1 + strlen("Roaming") + 1;
+      home_buf = (char *) malloc(base_len);
+      if (home_buf) {
+        snprintf(home_buf, base_len, "%s\\Roaming", local);
+        home = home_buf;
+      }
+    }
+  }
+  if (home == NULL || home[0] == '\0') {
     const char *user = getenv("USERPROFILE");
     if (user && user[0]) {
       size_t base_len = strlen(user) + 1 + strlen("AppData\\Roaming") + 1;
