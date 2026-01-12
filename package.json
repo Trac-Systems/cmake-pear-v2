@@ -23,7 +23,7 @@
     "cmake-bare": "^1.1.17",
     "cmake-fetch": "^1.4.1",
     "cmake-macos": "^1.0.0",
-    "cmake-msix": "^1.0.1",
+    "cmake-msix": "github:Trac-Systems/cmake-msix-v2#29bb9e1",
     "cmake-windows": "^1.0.0"
   }
 }
