@@ -9,24 +9,24 @@ resolve_platform_path(void) {
   if (rel == NULL || rel[0] == '\0') return NULL;
 
 #if defined(_WIN32) || defined(_WIN64)
-  const char *home = getenv("APPDATA");
+  const char *home = NULL;
   char *home_buf = NULL;
-  int home_abs = 0;
-  if (home && home[0]) {
-    home_abs = (home[0] == '\\' || (strlen(home) > 1 && home[1] == ':'));
-    if (!home_abs) home = NULL;
+
+  const char *local = getenv("LOCALAPPDATA");
+  const char *appdata = getenv("APPDATA");
+
+  if (local && local[0]) {
+    int local_abs = (local[0] == '\\' || (strlen(local) > 1 && local[1] == ':'));
+    if (local_abs) home = local;
   }
+
   if (home == NULL || home[0] == '\0') {
-    const char *local = getenv("LOCALAPPDATA");
-    if (local && local[0]) {
-      size_t base_len = strlen(local) + 1 + strlen("Roaming") + 1;
-      home_buf = (char *) malloc(base_len);
-      if (home_buf) {
-        snprintf(home_buf, base_len, "%s\\Roaming", local);
-        home = home_buf;
-      }
+    if (appdata && appdata[0]) {
+      int home_abs = (appdata[0] == '\\' || (strlen(appdata) > 1 && appdata[1] == ':'));
+      if (home_abs) home = appdata;
     }
   }
+
   if (home == NULL || home[0] == '\0') {
     const char *user = getenv("USERPROFILE");
     if (user && user[0]) {
