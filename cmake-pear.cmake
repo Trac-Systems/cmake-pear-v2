@@ -276,7 +276,7 @@ function(add_pear_appling target)
   endif()
 
 set(PEAR_LIBPEAR_URL "github:Trac-Systems/libpear-v2#7af9201" CACHE STRING "libpear source")
-set(PEAR_LIBAPPLING_URL "github:Trac-Systems/libappling-v2#65831ae" CACHE STRING "libappling source")
+set(PEAR_LIBAPPLING_URL "github:Trac-Systems/libappling-v2#be775e031d8b313a2ee3a5f893bd4aed6f4ab9d5" CACHE STRING "libappling source")
 
   bare_target(host)
 
@@ -347,4 +347,6 @@ set(PEAR_LIBAPPLING_URL "github:Trac-Systems/libappling-v2#65831ae" CACHE STRING
     )
   endif()
 endfunction()
+
+
 

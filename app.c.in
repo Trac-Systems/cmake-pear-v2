@@ -2,38 +2,62 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <ctype.h>
+static int
+contains_case_insensitive(const char *haystack, const char *needle) {
+  size_t i;
+  size_t j;
+  if (!haystack || !needle || !needle[0]) return 0;
+  for (i = 0; haystack[i]; i++) {
+    for (j = 0; needle[j]; j++) {
+      unsigned char hc = (unsigned char) haystack[i + j];
+      unsigned char nc = (unsigned char) needle[j];
+      if (!hc) return 0;
+      if (tolower(hc) != tolower(nc)) break;
+    }
+    if (!needle[j]) return 1;
+  }
+  return 0;
+}
+static int
+is_msix_redirected_path(const char *path) {
+  return contains_case_insensitive(path, "\\packages\\") ||
+         contains_case_insensitive(path, "/packages/") ||
+         contains_case_insensitive(path, "\\localcache\\local") ||
+         contains_case_insensitive(path, "/localcache/local");
+}
 static const char *
 resolve_platform_path(void) {
   const char *rel = "@PEAR_PLATFORM_PATH@";
   if (rel == NULL || rel[0] == '\0') return NULL;
-
 #if defined(_WIN32) || defined(_WIN64)
   const char *home = NULL;
   char *home_buf = NULL;
-
   const char *local = getenv("LOCALAPPDATA");
   const char *appdata = getenv("APPDATA");
-
-  if (local && local[0]) {
+  const char *program = getenv("PROGRAMDATA");
+  int local_redirected = local && local[0] && is_msix_redirected_path(local);
+  int appdata_redirected = appdata && appdata[0] && is_msix_redirected_path(appdata);
+  if (local && local[0] && !local_redirected) {
     int local_abs = (local[0] == '\\' || (strlen(local) > 1 && local[1] == ':'));
     if (local_abs) home = local;
   }
-
+  if ((home == NULL || home[0] == '\0') && (local_redirected || appdata_redirected)) {
+    if (program && program[0]) home = program;
+  }
   if (home == NULL || home[0] == '\0') {
-    if (appdata && appdata[0]) {
+    if (appdata && appdata[0] && !appdata_redirected) {
       int home_abs = (appdata[0] == '\\' || (strlen(appdata) > 1 && appdata[1] == ':'));
       if (home_abs) home = appdata;
     }
   }
-
   if (home == NULL || home[0] == '\0') {
     const char *user = getenv("USERPROFILE");
     if (user && user[0]) {
-      size_t base_len = strlen(user) + 1 + strlen("AppData\\Roaming") + 1;
+      size_t base_len = strlen(user) + 1 + strlen("AppData\\Local") + 1;
       home_buf = (char *) malloc(base_len);
       if (home_buf) {
-        snprintf(home_buf, base_len, "%s\\AppData\\Roaming", user);
+        snprintf(home_buf, base_len, "%s\\AppData\\Local", user);
         home = home_buf;
       }
     }
@@ -45,12 +69,10 @@ resolve_platform_path(void) {
   const char sep = '/';
   int is_abs = (rel[0] == '/');
 #endif
-
   if (is_abs || home == NULL || home[0] == '\0') {
     if (home_buf) free(home_buf);
     return rel;
   }
-
   size_t len = strlen(home) + 1 + strlen(rel) + 1;
   char *buf = (char *) malloc(len);
   if (!buf) {
@@ -61,12 +83,10 @@ resolve_platform_path(void) {
   if (home_buf) free(home_buf);
   return buf;
 }
-
 int
 main(int argc, char *argv[]) {
   pear_id_t id = "@PEAR_ID@";
   const char *name = "@PEAR_NAME@";
-
   // Use app-specific platform directory to avoid sharing pear runtime with other apps.
   pear_path = resolve_platform_path();
   return pear_launch(argc, argv, id, name);
