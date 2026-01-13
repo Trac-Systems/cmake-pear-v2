@@ -1,4 +1,4 @@
-include_guard()
+﻿include_guard()
 
 find_package(cmake-bare REQUIRED PATHS node_modules/cmake-bare)
 find_package(cmake-fetch REQUIRED PATHS node_modules/cmake-fetch)
@@ -276,7 +276,7 @@ function(add_pear_appling target)
   endif()
 
 set(PEAR_LIBPEAR_URL "github:Trac-Systems/libpear-v2#42e7e34f0e9d88a9e2f883d53540eee36451efa6" CACHE STRING "libpear source")
-set(PEAR_LIBAPPLING_URL "github:Trac-Systems/libappling-v2#167229d" CACHE STRING "libappling source")
+set(PEAR_LIBAPPLING_URL "github:Trac-Systems/libappling-v2#d79e1aa" CACHE STRING "libappling source")
 
   bare_target(host)
 
