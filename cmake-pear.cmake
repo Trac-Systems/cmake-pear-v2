@@ -138,11 +138,15 @@ function(configure_pear_appling_windows target)
       "${CMAKE_CURRENT_BINARY_DIR}/${ARGV_NAME}.manifest"
   )
 
-  code_sign_windows(
-    ${target}_signature
-    TARGET ${target}
-    THUMBPRINT "${ARGV_SIGNING_THUMBPRINT}"
-  )
+  set(msix_depends ${target})
+  if (ARGV_SIGNING_THUMBPRINT AND NOT ARGV_SIGNING_THUMBPRINT STREQUAL "-")
+    code_sign_windows(
+      ${target}_signature
+      TARGET ${target}
+      THUMBPRINT "${ARGV_SIGNING_THUMBPRINT}"
+    )
+    list(APPEND msix_depends ${target}_signature)
+  endif()
 
   add_appx_manifest(
     ${target}_manifest
@@ -165,15 +169,17 @@ function(configure_pear_appling_windows target)
   add_msix_package(
     ${target}_package
     DESTINATION "${ARGV_NAME}.msix"
-    DEPENDS ${target} ${target}_signature
+    DEPENDS ${msix_depends}
   )
 
-  code_sign_windows(
-    ${target}_package_signature
-    PATH "${CMAKE_CURRENT_BINARY_DIR}/${ARGV_NAME}.msix"
-    THUMBPRINT "${ARGV_SIGNING_THUMBPRINT}"
-    DEPENDS ${target}_package
-  )
+  if (ARGV_SIGNING_THUMBPRINT AND NOT ARGV_SIGNING_THUMBPRINT STREQUAL "-")
+    code_sign_windows(
+      ${target}_package_signature
+      PATH "${CMAKE_CURRENT_BINARY_DIR}/${ARGV_NAME}.msix"
+      THUMBPRINT "${ARGV_SIGNING_THUMBPRINT}"
+      DEPENDS ${target}_package
+    )
+  endif()
 endfunction()
 
 function(configure_pear_appling_linux target)
@@ -341,3 +347,4 @@ set(PEAR_LIBAPPLING_URL "github:Trac-Systems/libappling-v2#167229d" CACHE STRING
     )
   endif()
 endfunction()
+
