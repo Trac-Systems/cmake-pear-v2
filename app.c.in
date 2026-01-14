@@ -3,6 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#if defined(_WIN32) || defined(_WIN64)
+#include <windows.h>
+#include <appmodel.h>
+#ifndef APPMODEL_ERROR_NO_PACKAGE
+#define APPMODEL_ERROR_NO_PACKAGE 15700L
+#endif
+#endif
 static int
 contains_case_insensitive(const char *haystack, const char *needle) {
   size_t i;
@@ -26,6 +33,16 @@ is_msix_redirected_path(const char *path) {
          contains_case_insensitive(path, "\\localcache\\local") ||
          contains_case_insensitive(path, "/localcache/local");
 }
+#if defined(_WIN32) || defined(_WIN64)
+static int
+is_packaged_process(void) {
+  UINT32 len = 0;
+  LONG rc = GetCurrentPackageFullName(&len, NULL);
+  if (rc == APPMODEL_ERROR_NO_PACKAGE) return 0;
+  if (rc == ERROR_CALL_NOT_IMPLEMENTED) return 0;
+  return 1;
+}
+#endif
 static const char *
 resolve_platform_path(void) {
   const char *rel = "@PEAR_PLATFORM_PATH@";
@@ -38,12 +55,16 @@ resolve_platform_path(void) {
   const char *program = getenv("PROGRAMDATA");
   int local_redirected = local && local[0] && is_msix_redirected_path(local);
   int appdata_redirected = appdata && appdata[0] && is_msix_redirected_path(appdata);
-  if (local && local[0] && !local_redirected) {
-    int local_abs = (local[0] == '\\' || (strlen(local) > 1 && local[1] == ':'));
-    if (local_abs) home = local;
-  }
-  if ((home == NULL || home[0] == '\0') && (local_redirected || appdata_redirected)) {
+  int packaged = is_packaged_process();
+  int prefer_program = packaged || local_redirected || appdata_redirected;
+  if (prefer_program) {
     if (program && program[0]) home = program;
+  }
+  if (home == NULL || home[0] == '\0') {
+    if (local && local[0] && !local_redirected) {
+      int local_abs = (local[0] == '\\' || (strlen(local) > 1 && local[1] == ':'));
+      if (local_abs) home = local;
+    }
   }
   if (home == NULL || home[0] == '\0') {
     if (appdata && appdata[0] && !appdata_redirected) {
