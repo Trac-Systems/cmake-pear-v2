@@ -42,6 +42,34 @@ is_packaged_process(void) {
   if (rc == ERROR_CALL_NOT_IMPLEMENTED) return 0;
   return 1;
 }
+static char *
+dup_env_var(const char *name) {
+  char buf[512];
+  DWORD len = GetEnvironmentVariableA(name, buf, sizeof(buf));
+  if (len == 0 || len >= sizeof(buf)) return NULL;
+  char *out = (char *) malloc(len + 1);
+  if (!out) return NULL;
+  memcpy(out, buf, len);
+  out[len] = '\0';
+  return out;
+}
+static char *
+resolve_programdata_path(void) {
+  char *path = dup_env_var("ProgramData");
+  if (!path) path = dup_env_var("ALLUSERSPROFILE");
+  if (!path) {
+    char drive[32];
+    DWORD len = GetEnvironmentVariableA("SystemDrive", drive, sizeof(drive));
+    if (len > 0 && len < sizeof(drive)) {
+      size_t total = len + strlen("\\ProgramData") + 1;
+      path = (char *) malloc(total);
+      if (path) {
+        snprintf(path, total, "%s\\ProgramData", drive);
+      }
+    }
+  }
+  return path;
+}
 #endif
 static const char *
 resolve_platform_path(void) {
@@ -52,13 +80,18 @@ resolve_platform_path(void) {
   char *home_buf = NULL;
   const char *local = getenv("LOCALAPPDATA");
   const char *appdata = getenv("APPDATA");
-  const char *program = getenv("PROGRAMDATA");
   int local_redirected = local && local[0] && is_msix_redirected_path(local);
   int appdata_redirected = appdata && appdata[0] && is_msix_redirected_path(appdata);
   int packaged = is_packaged_process();
   int prefer_program = packaged || local_redirected || appdata_redirected;
   if (prefer_program) {
-    if (program && program[0]) home = program;
+    home_buf = resolve_programdata_path();
+    if (home_buf && home_buf[0]) {
+      home = home_buf;
+    } else if (home_buf) {
+      free(home_buf);
+      home_buf = NULL;
+    }
   }
   if (home == NULL || home[0] == '\0') {
     if (local && local[0] && !local_redirected) {
